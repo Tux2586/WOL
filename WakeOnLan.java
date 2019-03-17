@@ -2,21 +2,22 @@ import java.io.*;
 import java.net.*;
 
 public class WakeOnLan {
-    
-    public static final int PORT = 9;    
-    
+
+    public static final int PORT = 9;
+
     public static void main(String[] args) {
-        
+
         if (args.length != 2) {
             System.out.println("Usage: java WakeOnLan <broadcast-ip> <mac-address>");
             System.out.println("Example: java WakeOnLan 192.168.0.255 00:0D:61:08:22:4A");
             System.out.println("Example: java WakeOnLan 192.168.0.255 00-0D-61-08-22-4A");
             System.exit(1);
         }
-        
+
+        System.out.println("Broadcast IP:\t" + args[0] + "\nMAC Address:\t" + args[1]);
         String ipStr = args[0];
         String macStr = args[1];
-        
+
         try {
             byte[] macBytes = getMacBytes(macStr);
             byte[] bytes = new byte[6 + 16 * macBytes.length];
@@ -26,22 +27,22 @@ public class WakeOnLan {
             for (int i = 6; i < bytes.length; i += macBytes.length) {
                 System.arraycopy(macBytes, 0, bytes, i, macBytes.length);
             }
-            
+
             InetAddress address = InetAddress.getByName(ipStr);
             DatagramPacket packet = new DatagramPacket(bytes, bytes.length, address, PORT);
             DatagramSocket socket = new DatagramSocket();
             socket.send(packet);
             socket.close();
-            
+
             System.out.println("Wake-on-LAN packet sent.");
         }
         catch (Exception e) {
             System.out.println("Failed to send Wake-on-LAN packet: + e");
             System.exit(1);
         }
-        
+
     }
-    
+
     private static byte[] getMacBytes(String macStr) throws IllegalArgumentException {
         byte[] bytes = new byte[6];
         String[] hex = macStr.split("(\\:|\\-)");
@@ -58,6 +59,6 @@ public class WakeOnLan {
         }
         return bytes;
     }
-    
-   
+
+
 }
